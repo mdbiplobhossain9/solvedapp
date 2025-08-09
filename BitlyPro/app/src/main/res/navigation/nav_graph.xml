@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/speedTestFragment">
+
+    <fragment
+        android:id="@+id/speedTestFragment"
+        android:name="com.bitlypro.myapp.ui.speedtest.SpeedTestFragment"
+        android:label="@string/speed_test"
+        tools:layout="@layout/fragment_speed_test" />
+        
+    <fragment
+        android:id="@+id/chartFragment"
+        android:name="com.bitlypro.myapp.ui.charts.ChartFragment"
+        android:label="@string/history"
+        tools:layout="@layout/fragment_chart" />
+
+</navigation>

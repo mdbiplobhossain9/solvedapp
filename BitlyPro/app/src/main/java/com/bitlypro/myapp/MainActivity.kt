@@ -1,27 +1,63 @@
 package com.bitlypro.myapp
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.bitlypro.myapp.ui.speedtest.SpeedTestFragment
-import com.bitlypro.myapp.ui.charts.ChartFragment
-import com.bitlypro.myapp.ui.theme.BitlyProTheme
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.bitlypro.myapp.databinding.ActivityMainBinding
+import com.bitlypro.myapp.ui.speedtest.SpeedTestViewModel
+import com.bitlypro.myapp.utils.ThemePreference
+import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+    
+    private lateinit var binding: ActivityMainBinding
+    private val speedTestViewModel: SpeedTestViewModel by viewModels()
+    private lateinit var themePreference: ThemePreference
+    
     override fun onCreate(savedInstanceState: Bundle?) {
+        themePreference = ThemePreference(this)
+        applyTheme()
+        
         super.onCreate(savedInstanceState)
-        setContent {
-            BitlyProTheme {
-                val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "speedTest") {
-                    composable("speedTest") { SpeedTestFragment() }
-                    composable("chart") { ChartFragment() }
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        
+        setupNavigation()
+        setupThemeToggle()
+    }
+    
+    private fun setupNavigation() {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        binding.bottomNavigation.setupWithNavController(navController)
+    }
+    
+    private fun setupThemeToggle() {
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_theme_toggle -> {
+                    lifecycleScope.launch {
+                        themePreference.toggleTheme()
+                        applyTheme()
+                    }
+                    true
                 }
+                else -> false
             }
+        }
+    }
+    
+    private fun applyTheme() {
+        lifecycleScope.launch {
+            val isDarkMode = themePreference.isDarkMode()
+            AppCompatDelegate.setDefaultNightMode(
+                if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES
+                else AppCompatDelegate.MODE_NIGHT_NO
+            )
         }
     }
 }
